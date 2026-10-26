@@ -1,6 +1,8 @@
 use tokio::net::{TcpListener, TcpStream};
 use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
 
+use crate::requests::RequestType;
+
 pub mod logging;
 pub mod requests;
 
@@ -53,12 +55,19 @@ async fn handle_connection(
         println!("Type: {req_type}, IP/Domain: {req_ip}, Protocol: {req_protocol}");
 
         let mut server = TcpStream::connect(req_ip).await?;
-        println!("Writing 200 connection established");
-        client.write_all(&format!("{req_protocol} 200 Connection Established{REQUEST_TAIL}").into_bytes()).await?;
+        match RequestType::from_str(req_type) {
+            RequestType::Connect => {
+                println!("Writing 200 connection established");
+                client.write_all(&format!("{req_protocol} 200 Connection Established{REQUEST_TAIL}").into_bytes()).await?;
 
-        println!("Tunnel starting");
-        io::copy_bidirectional(&mut client, &mut server).await?;
-        println!("Tunnel ended");
+                println!("Tunnel starting");
+                io::copy_bidirectional(&mut client, &mut server).await?;
+                println!("Tunnel ended");
+            },
+            RequestType::Unsupported(something_else) => {
+                panic!("Unsupported protocol: {something_else}")
+            },
+        }
     } else {
         panic!("Request was empty");
     };

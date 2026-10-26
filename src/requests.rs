@@ -1,13 +1,14 @@
-pub enum RequestType {
+pub enum RequestType<'a> {
     Connect,
+    Unsupported(&'a str)
 }
 
-impl RequestType {
-    pub fn from_str(from: &str) -> Option<Self> {
+impl<'a> RequestType<'a> {
+    pub fn from_str(from: &'a str) -> Self {
         use RequestType::*;
         match from {
-            "CONNECT" => { Some(Connect) },
-            _ => { None },
+            "CONNECT" => { Connect },
+            something_else => { Unsupported(something_else) },
         }
     }
 }
