@@ -12,11 +12,13 @@ pub const ISO8601_CFG_SEC: Iso8601<{
         .encode()
 }> = Iso8601::<_>;
 
+#[derive(Debug, Clone)]
 pub enum LogFrom {
     App,
     Net,
 }
 
+#[derive(Debug, Clone)]
 pub enum LogType {
     Verbose,
     Info,
@@ -24,6 +26,7 @@ pub enum LogType {
     Error,
 }
 
+#[derive(Debug, Clone)]
 pub struct NpLog {
     from: LogFrom,
     variant: LogType,
