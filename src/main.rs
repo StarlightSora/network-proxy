@@ -73,26 +73,30 @@ async fn handle_connection(
         )).await?;
 
         let mut server = TcpStream::connect(req_ip).await?;
-        match RequestType::from_str(req_type) {
-            RequestType::Connect => {
-                log_file.write_log(NpLog::now(
-                    LogFrom::Net, LogType::Verbose,
-                    "Writing 200 connection established".to_string(),
-                )).await?;
-                client.write_all(&format!("{req_protocol} 200 Connection Established{REQUEST_TAIL}").into_bytes()).await?;
+        match RequestType::try_from(req_type) {
+            Ok(req_type) => {
+                match req_type {
+                    RequestType::Connect => {
+                        log_file.write_log(NpLog::now(
+                            LogFrom::Net, LogType::Verbose,
+                            "Writing 200 connection established".to_string(),
+                        )).await?;
+                        client.write_all(&format!("{req_protocol} 200 Connection Established{REQUEST_TAIL}").into_bytes()).await?;
 
-                log_file.write_log(NpLog::now(
-                    LogFrom::Net, LogType::Verbose,
-                    format!("Tunnel starting: {req_ip}"),
-                )).await?;
-                io::copy_bidirectional(&mut client, &mut server).await?;
-                log_file.write_log(NpLog::now(
-                    LogFrom::Net, LogType::Verbose,
-                    format!("Tunnel ended: {req_ip}"),
-                )).await?;
+                        log_file.write_log(NpLog::now(
+                            LogFrom::Net, LogType::Verbose,
+                            format!("Tunnel starting: {req_ip}"),
+                        )).await?;
+                        io::copy_bidirectional(&mut client, &mut server).await?;
+                        log_file.write_log(NpLog::now(
+                            LogFrom::Net, LogType::Verbose,
+                            format!("Tunnel ended: {req_ip}"),
+                        )).await?;
+                    },
+                }
             },
-            RequestType::Unsupported(something_else) => {
-                 log_file.write_log(NpLog::now(
+            Err(something_else) => {
+                log_file.write_log(NpLog::now(
                     LogFrom::Net, LogType::Error,
                     format!("Unsupported protocol: {something_else}"),
                 )).await?;
