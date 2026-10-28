@@ -7,4 +7,5 @@ publish = false
 [dependencies]
 anyhow = "1"
 bytes = "1"
+time = { version = "0.3.55", features = ["parsing", "formatting"] }
 tokio = { version = "1", features = ["full"] }

@@ -1,10 +1,11 @@
+pub mod logging;
+pub mod requests;
+
+use time::Timestamp;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
 
 use crate::requests::RequestType;
-
-pub mod logging;
-pub mod requests;
 
 const BIND_ADDR: &'static str = "127.0.0.1:8080";
 const REQUEST_TAIL: &'static str = "\r\n\r\n";
@@ -34,6 +35,8 @@ async fn handle_connection(
     let n = client.read(&mut buf).await?;
     let raw_request = String::from_utf8_lossy(&buf[..n]);
     println!("AsyncReadExt read the following: {raw_request}");
+
+    let log_file = logging::fileio::LogFile::from_date_time(Timestamp::now()).await?;
 
     // parse request header
     let san_request = {
@@ -72,5 +75,6 @@ async fn handle_connection(
         panic!("Request was empty");
     };
 
+    drop(log_file);
     Ok(())
 }
