@@ -28,7 +28,7 @@ impl LogFile {
     }
     pub async fn from_date_time(unix_time: Timestamp) -> anyhow::Result<Self> {
         let formatted = unix_time.format(&super::datatypes::ISO8601_CFG_SEC)?;
-        let formatted = to_file_safe(&formatted);
+        let formatted = Self::to_file_safe(&formatted);
         let binding = format!("{}log_{}.txt", LOGS_PREFIX, formatted);
         Self::new(Path::new(&binding)).await
     }
@@ -47,8 +47,8 @@ impl LogFile {
         self.file.write_all((string_log + "\n").as_bytes()).await?;
         Ok(())
     }
-}
-
-pub fn to_file_safe(incoming: &str) -> String {
-    incoming.replace(":", "_") // FIXME: this does a new allocation, which is probably unnecessary
+    
+    pub fn to_file_safe(incoming: &str) -> String {
+        incoming.replace(":", "_") // FIXME: this does a new allocation, which is probably unnecessary
+    }
 }

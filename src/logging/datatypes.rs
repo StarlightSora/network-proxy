@@ -39,12 +39,12 @@ impl NpLog {
         Self { from, variant, time, body }
     }
     pub fn now(from: LogFrom, variant: LogType, body: String) -> Self {
-        Self {
+        Self::new(
             from,
             variant,
-            time: Timestamp::now(),
+            Timestamp::now(),
             body,
-        }
+        )
     }
     pub fn to_string(&self) -> anyhow::Result<String> {
         let fmt_time = self.time.format(&ISO8601_CFG_DECI)?;

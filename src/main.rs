@@ -25,7 +25,7 @@ async fn main() -> anyhow::Result<()> {
         tokio::spawn(async move {
             println!("New connection: {addr}");
             handle_connection(sock, log_clo).await.unwrap_or_else(|err| {
-                panic!("{:?}", err)
+                panic!("{:?}", err) // TODO: How do we handle this?
             });
         });
     }
@@ -62,7 +62,7 @@ async fn handle_connection(
                 LogFrom::Net, LogType::Error,
                 "Request was malformed".to_string(),
             )).await?;
-            panic!("Request was malformed"); // TODO: Change panics to use anyhow
+            anyhow::bail!("Request was malformed"); // TODO: These &'static str error messages should be changed to error enums
         }
         let req_type = parts[0];
         let req_ip = parts[1];
@@ -96,7 +96,7 @@ async fn handle_connection(
                     LogFrom::Net, LogType::Error,
                     format!("Unsupported protocol: {something_else}"),
                 )).await?;
-                panic!("Unsupported protocol: {something_else}"); // TODO: Change panics to use anyhow
+                anyhow::bail!("Unsupported protocol: {something_else}");
             },
         }
     } else {
@@ -104,7 +104,7 @@ async fn handle_connection(
             LogFrom::Net, LogType::Error,
             "Request was empty".to_string(),
         )).await?;
-        panic!("Request was empty"); // TODO: Change panics to use anyhow
+        anyhow::bail!("Request was empty");
     };
 
     drop(log_file);
