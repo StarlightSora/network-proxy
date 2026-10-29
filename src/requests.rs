@@ -29,10 +29,10 @@ impl<'a> NetRequest<'a> {
     pub fn new(kind: &'a str, target: &'a str, protocol: &'a str) -> Result<Self, NetRequestError<'a>> {
         match RequestType::try_from(kind) {
             Ok(kind) => { Ok(Self {
-            kind,
-            target,
-            protocol
-        }) },
+                kind,
+                target,
+                protocol
+            }) },
             Err(something_else) => { Err(NetRequestError::InvalidRequestType(something_else)) },
         }
     }

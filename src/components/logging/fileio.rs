@@ -5,7 +5,7 @@ use tokio::{fs::{File, OpenOptions, create_dir_all}, io::AsyncWriteExt};
 
 use super::datatypes::NpLog;
 
-const MIRROR_TO_STDOUT: bool = true;
+const MIRROR_TO_STDOUT: bool = false;
 const LOGS_PREFIX: &'static str = "output/logs/"; 
 
 #[derive(Debug)]
